@@ -12,6 +12,8 @@ import java.io.*;
 
 public class Gui {
 
+    Settings settings;
+
     Client client;
 
     JFrame container;
@@ -30,8 +32,12 @@ public class Gui {
     boolean pendingMessage = false;
     public static boolean readyToConnect = false;
     public static boolean readyToDisconnect = false;
+    public static boolean isConnected = false;
     String message = "Test";
     String nick = "Anon";
+
+    int portNumber;
+    String hostName;
 
     public Gui (Settings settings) {
 
@@ -39,10 +45,12 @@ public class Gui {
         this.height = settings.GUI_HEIGHT;
         this.title = settings.GUI_TITLE;
 
+        this.portNumber = settings.portNumber;
+        this.hostName = settings.hostName;
+
     }
 
     public void load () {
-
         container = new JFrame(title);
 
         textArea = new JTextArea(width, height);
@@ -64,6 +72,7 @@ public class Gui {
                 if (message.toLowerCase().startsWith("/nick")) {
                     try {
                         nick = message.substring(6);
+                        addText("Changed nick to: " + nick);
                     }
                     catch (Exception ex) {
                         addText("Could not change nickname.");
@@ -71,6 +80,30 @@ public class Gui {
                 }
                 else if (message.toLowerCase().startsWith("/connect")) {
                     readyToConnect = true;
+                }
+                else if (message.toLowerCase().startsWith("/set host")) {
+                    try {
+                        hostName = message.substring(10);
+                        addText("Set hostname to: " + hostName);
+                        //settings.hostName = hostName;
+                    }
+                    catch (Exception ex) {
+                        addText("Could not set host");
+                    }
+                }
+                else if (message.toLowerCase().startsWith("/set port")) {
+                    try {
+                        portNumber = Integer.parseInt(message.substring(10));
+                        addText("Set the port number to: " + portNumber);
+                        //settings.portNumber = portNumber;
+                    }
+                    catch (Exception ex) {
+                        addText("Could not set port");
+                    }
+                }
+                else if (message.toLowerCase().startsWith("/status")) {
+                    addText("NickName: " + nick + "\n" + "Host: " + hostName + "\n" + "Port: " + portNumber + "\n" + "Connected: " + isConnected);
+
                 }
                 else {
                     pendingMessage = true;
@@ -91,7 +124,7 @@ public class Gui {
 
 
         //TODO: Grab from settings
-        client = new Client("localhost", 16000);
+        client = new Client(hostName, portNumber);
         client.run();
 
 
@@ -128,6 +161,7 @@ public class Gui {
 
                         String line = "";
                         boolean running = true;
+                        isConnected = true;
                         while (running) {
                             try {
                                 String oldLine = line;
