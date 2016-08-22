@@ -107,9 +107,25 @@ public class Gui {
 
                 }
                 else if (message.toLowerCase().startsWith("/userlist")) {
-                    addText("Requesting a list of connected users");
                     message = nick + ",userlist";
                     pendingCommand = true;
+                }
+                else if (message.toLowerCase().startsWith("/stop")) {
+                    message = nick + ",stop";
+                    pendingCommand = true;
+                }
+                else if (message.toLowerCase().startsWith("/auth")) {
+                    try {
+                        String[] split = message.split(" ");
+                        String user = split[1];
+                        String pass = split[2];
+                        System.out.println(pass);
+                        message = nick + ",auth," + user + "," + pass;
+                        pendingCommand = true;
+                    }
+                    catch (Exception ex) {
+                        addText("invalid usage of command: /auth");
+                    }
                 }
                 else {
                     pendingMessage = true;
