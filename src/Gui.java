@@ -30,6 +30,7 @@ public class Gui {
     String title;
 
     boolean pendingMessage = false;
+    boolean pendingCommand = false;
     public static boolean readyToConnect = false;
     public static boolean readyToDisconnect = false;
     public static boolean isConnected = false;
@@ -105,6 +106,11 @@ public class Gui {
                     addText("NickName: " + nick + "\n" + "Host: " + hostName + "\n" + "Port: " + portNumber + "\n" + "Connected: " + isConnected);
 
                 }
+                else if (message.toLowerCase().startsWith("/userlist")) {
+                    addText("Requesting a list of connected users");
+                    message = nick + ",userlist";
+                    pendingCommand = true;
+                }
                 else {
                     pendingMessage = true;
                 }
@@ -162,9 +168,15 @@ public class Gui {
                         String line = "";
                         boolean running = true;
                         isConnected = true;
+                        String oldLine = "";
                         while (running) {
                             try {
-                                String oldLine = line;
+                                 oldLine = "";
+                                //if (!(line.startsWith("[Server]"))) {
+                                    oldLine = line;
+                                //}
+
+
                                 line = in.readUTF();
                                 if (!(oldLine.equals(line))) {
                                     addText(line);
@@ -180,7 +192,13 @@ public class Gui {
                                     System.out.println("sent a message");
                                     pendingMessage = false;
                                     out.writeUTF("<" + nick + ">  " + message);
-                                } else {
+                                }
+                                else if (pendingCommand) {
+                                    System.out.println("sent a command");
+                                    pendingCommand = false;
+                                    out.writeUTF(message);
+                                }
+                                else {
                                     out.writeUTF(nick + ",Alive");
                                 }
                             } catch (IOException e) {
@@ -216,66 +234,6 @@ public class Gui {
                     }
                 }
             }
-
-            //
-
-
-        }
-
-    }
-
-    private class MessageReceiver implements Runnable {
-        DataInputStream in;
-        public MessageReceiver(DataInputStream in) {
-            this.in = in;
-        }
-        public void run() {
-            String line = "";
-            boolean running = true;
-            while (running) {
-                try {
-                    String oldLine = line;
-                    line = in.readUTF();
-                    if (!(oldLine.equals(line))) {
-                        addText(line);
-                    }
-
-                }
-                catch (IOException e) {
-                    System.out.println("Could not receive a message");
-                    running = false;
-                }
-
-            }
         }
     }
-
-    private class MessageSender implements Runnable {
-        DataOutputStream out;
-        public MessageSender(DataOutputStream out) {
-            this.out = out;
-        }
-        public void run() {
-            boolean running = true;
-            while (running) {
-                try {
-                    if (pendingMessage) {
-                        System.out.println("sent a message");
-                        pendingMessage = false;
-                        out.writeUTF("<" + nick + "> :" + message);
-                    }
-                    else {
-                        out.writeUTF(nick + ",Alive");
-                    }
-                }
-                catch (IOException e) {
-                    System.out.println("Could not send a message");
-                    running = false;
-                }
-            }
-        }
-    }
-
-
-
 }
