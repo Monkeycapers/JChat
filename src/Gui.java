@@ -127,6 +127,26 @@ public class Gui {
                         addText("invalid usage of command: /auth");
                     }
                 }
+                else if (message.toLowerCase().startsWith("/signup")) {
+                    try {
+                        String[] split = message.split(" ");
+                        String user = split[1];
+                        String pass = split[2];
+                        message = nick + ",signup," + user + "," + pass;
+
+                        pendingCommand = true;
+                    }
+                    catch (Exception ex) {
+                        addText("invalid usage of command: /auth");
+                    }
+                }
+                else if (message.toLowerCase().startsWith("/promote")) {
+                    String[] split = message.split(" ");
+                    String user = split[1];
+                    String rank = split[2];
+                    message = nick + ",promote," + user + "," + rank;
+                    pendingCommand = true;
+                }
                 else {
                     pendingMessage = true;
                 }
