@@ -21,6 +21,8 @@ public class Gui {
     int width;
     int height;
 
+
+
     JTextArea textArea;
 
     JTextField textField;
@@ -31,6 +33,7 @@ public class Gui {
 
     boolean pendingMessage = false;
     boolean pendingCommand = false;
+    boolean pendingDisconnect = false;
     public static boolean readyToConnect = false;
     public static boolean readyToDisconnect = false;
     public static boolean isConnected = false;
@@ -45,7 +48,7 @@ public class Gui {
         this.width = settings.GUI_WIDTH;
         this.height = settings.GUI_HEIGHT;
         this.title = settings.GUI_TITLE;
-
+        readyToConnect = settings.autoConnect;
         this.portNumber = settings.portNumber;
         this.hostName = settings.hostName;
 
@@ -80,7 +83,7 @@ public class Gui {
                     }
                 }
                 else if (message.toLowerCase().startsWith("/connect")) {
-                    readyToConnect = true;
+                    readyToConnect = !readyToConnect;
                 }
                 else if (message.toLowerCase().startsWith("/set host")) {
                     try {
@@ -146,6 +149,18 @@ public class Gui {
                     String rank = split[2];
                     message = nick + ",promote," + user + "," + rank;
                     pendingCommand = true;
+                }
+                else if (message.toLowerCase().startsWith("/delete")) {
+                    String[] split = message.split(" ");
+                    String user = split[1];
+                    //String rank = split[2];
+                    message = nick + ",delete," + user;
+                    pendingCommand = true;
+                }
+                else if (message.toLowerCase().startsWith("/disconnect")) {
+                    message = nick + ",disconnect,";
+                    pendingCommand = true;
+                    pendingDisconnect = true;
                 }
                 else {
                     pendingMessage = true;
@@ -214,7 +229,7 @@ public class Gui {
 
 
                                 line = in.readUTF();
-                                if (!(oldLine.equals(line))) {
+                                if (!(oldLine.equals(line)) && !line.equals("")) {
                                     addText(line);
                                 }
 
@@ -230,9 +245,17 @@ public class Gui {
                                     out.writeUTF("<" + nick + ">  " + message);
                                 }
                                 else if (pendingCommand) {
+
                                     System.out.println("sent a command");
                                     pendingCommand = false;
                                     out.writeUTF(message);
+                                    if (pendingDisconnect) {
+                                        pendingDisconnect = false;
+                                        running = false;
+                                        readyToConnect = false;
+                                        pendingMessage = false;
+                                        isConnected = false;
+                                    }
                                 }
                                 else {
                                     out.writeUTF(nick + ",Alive");
@@ -257,6 +280,7 @@ public class Gui {
                     } catch (IOException e) {
                         //This can happen if the server has an error or closes
                         addText("Couldn't get I/O for the connection to " + hostName);
+                        readyToConnect = false;
                     } catch (Exception e) {
                         addText("Unknown error");
                         System.exit(-1);
