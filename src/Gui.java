@@ -7,6 +7,8 @@ import java.awt.image.*;
 import java.awt.event.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.*;
 
@@ -109,6 +111,10 @@ public class Gui {
                     addText("NickName: " + nick + "\n" + "Host: " + hostName + "\n" + "Port: " + portNumber + "\n" + "Connected: " + isConnected);
 
                 }
+                else if (message.toLowerCase().startsWith("/alluserlist")) {
+                    message = nick + ",alluserlist";
+                    pendingCommand = true;
+                }
                 else if (message.toLowerCase().startsWith("/userlist")) {
                     message = nick + ",userlist";
                     pendingCommand = true;
@@ -148,6 +154,13 @@ public class Gui {
                     String user = split[1];
                     String rank = split[2];
                     message = nick + ",promote," + user + "," + rank;
+                    pendingCommand = true;
+                }
+                else if (message.toLowerCase().startsWith("/pm")) {
+                    String[] split = message.split(" ");
+                    String user = split[1];
+                    String msg = split[2];
+                    message = nick + ",pm," + user + "," +  msg;
                     pendingCommand = true;
                 }
                 else if (message.toLowerCase().startsWith("/delete")) {
@@ -230,7 +243,9 @@ public class Gui {
 
                                 line = in.readUTF();
                                 if (!(oldLine.equals(line)) && !line.equals("")) {
-                                    addText(line);
+                                    DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+                                    Date date = new Date();
+                                    addText( "(" + dateFormat.format(date) + ") " + line);
                                 }
 
                             } catch (IOException e) {
@@ -289,7 +304,7 @@ public class Gui {
                 }
                 else {
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(settings.delay);
                     } catch (Exception ex) {
                     }
                 }

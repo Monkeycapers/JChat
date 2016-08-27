@@ -11,10 +11,11 @@ public class Settings {
 
     int GUI_WIDTH = 10;
     int GUI_HEIGHT = 50;
-    String GUI_TITLE = "JChat 0.05";
+    String GUI_TITLE = "JChat 0.06";
 
     String hostName = "localhost";
     int portNumber = 16000;
+    int delay = 10;
     boolean autoConnect = true;
 
     public Settings () {
