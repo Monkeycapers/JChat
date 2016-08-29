@@ -13,7 +13,7 @@ public class Settings {
     int GUI_HEIGHT = 50;
     String GUI_TITLE = "JChat 0.06";
 
-    String hostName = "localhost";
+    String hostName = "192.168.2.187";
     int portNumber = 16000;
     int delay = 10;
     boolean autoConnect = true;

@@ -91,6 +91,9 @@ public class Gui {
                     try {
                         hostName = message.substring(10);
                         addText("Set hostname to: " + hostName);
+                        //Todo: This is broken
+                        //client = new Client(hostName, portNumber);
+                        //client.run();
                         //settings.hostName = hostName;
                     }
                     catch (Exception ex) {
@@ -101,6 +104,9 @@ public class Gui {
                     try {
                         portNumber = Integer.parseInt(message.substring(10));
                         addText("Set the port number to: " + portNumber);
+                        //Todo: This is broken
+                        //client = new Client(hostName, portNumber);
+                        //client.run();
                         //settings.portNumber = portNumber;
                     }
                     catch (Exception ex) {
